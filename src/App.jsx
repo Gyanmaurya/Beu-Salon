@@ -1,23 +1,31 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useEffect, useState } from "react";
 import "./App.css";
 
 function App() {
   const [user, setUser] = useState([]);
   const [search, setSearch] = useState("");
+  const inputrf=useRef()
 
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/posts")
       .then((res) => res.json())
-      .then((data) => setUser(data));
-  }, [user]);
+      .then((data) => {inputrf.current=data;
+        setUser(inputrf.current)
+      });
+      
+
+  },[]);
+  
   function filterHandler() {
-    setUser(user.filter((val) => val.title.includes(search)));
+    const data=inputrf.current.filter((val) => val.title.includes(search))
+    
+    setUser(data);
+   
   }
   function Handler(e) {
     setSearch(e.target.value);
   }
-
   return (
     <div className="App">
       <input
@@ -27,11 +35,8 @@ function App() {
         onChange={Handler}
       />
       <button onClick={filterHandler}>filter</button>
-      {user
-        .filter((val) => val.title.includes(search))
-        .map((data) => (
-          <p key={data.id}>
-            {" "}
+      {user?.map((data) => (<p key={data.id}>
+            
             {data.id}. {data.title}{" "}
           </p>
         ))}
